@@ -27,20 +27,21 @@
 
 (deftest condition-side-effects
   (testing "Side-effects in the conditions are evaluated exactly once, and for all conditions"
-    (let [proof (atom [])]
-      (sut/one
-        (do
-          (swap! proof conj :first)
-          false) 1
-        (do
-          (swap! proof conj :second)
-          true)  2
-        (do
-          (swap! proof conj :third)
-          false) 3)
+    (are [input expected] (let [proof (atom [])]
+                            (input
+                             (do
+                               (swap! proof conj :first)
+                               false) 1
+                             (do
+                               (swap! proof conj :second)
+                               true)  2
+                             (do
+                               (swap! proof conj :third)
+                               false) 3)
 
-      (is (= [:first :second :third]
-             @proof)))))
+                            (= expected @proof))
+      sut/one [:first :second :third]
+      cond    [:first :second])))
 
 (deftest consequence-side-effects
   (testing "Only the 'chosen' consequence is executed, and it is exactly once"
