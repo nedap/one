@@ -108,22 +108,22 @@ As one can observe, Rich repeatedly denounces sequentiality as a source of compl
 i.e., how is:
 
 ```clojure
-(if x
-  1
-  2)
-```
-
-...better than...
-
-```clojure
 (one
   x       1
   (not x) 1)
 ```
 
+...better than...
+
+```clojure
+(if x
+  1
+  2)
+```
+
 ...?
 
-* Sometimes this repetition can make code clearer
+* Sometimes `one`'s repetition can make code clearer
   * particularly for 3+ clauses
   * or when there are delicate boolean variations (`not`, `or`, `and`) between clauses
   * The possible conditions are summarized to humans flatly, so they can be understood in a glance, similar to how tables tend to make info easier to grok. 
