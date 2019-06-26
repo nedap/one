@@ -1,22 +1,21 @@
 (defproject com.nedap.staffing-solutions/one "0.1.0-alpha1"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[com.nedap.staffing-solutions/utils.modular "0.3.0"]
-                 [com.nedap.staffing-solutions/utils.spec "0.7.1-alpha2"]
-                 [com.stuartsierra/component "0.4.0"]
-                 [com.taoensso/timbre "4.10.0"]
-                 [org.clojure/clojure "1.10.0"]
-                 [org.clojure/test.check "0.10.0-alpha3"]]
+                 [com.nedap.staffing-solutions/utils.spec "0.8.2"
+                  :exclusions [org.clojure/spec.alpha]]
+                 [org.clojure/clojure "1.10.1"]
+                 [org.clojure/spec.alpha "0.2.176"]]
 
   :description "A safer cond"
 
-  :url "http://github.com/nedap/one"
+  :url "https://github.com/nedap/one"
 
   :min-lein-version "2.0.0"
 
   :license {:name "EPL-2.0"
             :url  "https://www.eclipse.org/legal/epl-2.0/"}
 
-  :signing {:gpg-key "servicedesk-PEP@nedap.com"}
+  :signing {:gpg-key "releases-staffingsolutions@nedap.com"}
 
   :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
                              :username :env/artifactory_user
@@ -32,8 +31,6 @@
 
   :monkeypatch-clojure-test false
 
-  :plugins [[lein-cljsbuild "1.1.7"]]
-
   :repl-options {:init-ns dev}
 
   ;; Please don't add `:hooks [leiningen.cljsbuild]`. It can silently skip running the JS suite on `lein test`.
@@ -46,14 +43,44 @@
                                               :target        :nodejs
                                               :optimizations :none}}}}
 
+  ;; A variety of common dependencies are bundled with `nedap/lein-template`.
+  ;; They are divided into two categories:
+  ;; * Dependencies that are possible or likely to be needed in all kind of production projects
+  ;;   * The point is that when you realise you needed them, they are already in your classpath, avoiding interrupting your flow
+  ;;   * After realising this, please move the dependency up to the top level.
+  ;; * Genuinely dev-only dependencies allowing 'basic science'
+  ;;   * e.g. criterium, deep-diff, clj-java-decompiler
+
+  ;; NOTE: deps marked with #_"transitive" are there to satisfy the `:pedantic?` option.
   :profiles {:dev      {:dependencies [[cider/cider-nrepl "0.16.0" #_"formatting-stack needs it"]
                                        [com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
+                                       [com.stuartsierra/component "0.4.0"]
+                                       [com.taoensso/timbre "4.10.0"]
                                        [criterium "0.4.4"]
-                                       [formatting-stack "0.17.0"]
+                                       [formatting-stack "0.18.4"
+                                        :exclusions [rewrite-clj]]
                                        [lambdaisland/deep-diff "0.0-29"]
+                                       [medley "1.1.0"]
+                                       [org.clojure/core.async "0.4.490"]
+                                       [org.clojure/math.combinatorics "0.1.1"]
+                                       [org.clojure/test.check "0.10.0-alpha3"]
                                        [org.clojure/tools.namespace "0.3.0-alpha4"]
-                                       [org.clojure/tools.reader "1.1.1" #_"formatting-stack needs it"]]
-                        :plugins      [[lein-cloverage "1.0.13"]]
+                                       [org.clojure/tools.reader "1.1.1" #_"transitive"]
+                                       [rewrite-clj "0.6.1" #_"transitive"]]
+                        :plugins      [[lein-cljsbuild "1.1.7"]
+                                       [lein-cloverage "1.0.13"]
+                                       [lein-pprint "1.1.2"]]
                         :source-paths ["dev" "test"]}
 
-             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]]}})
+             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"
+                                        :exclusions [com.cognitect/transit-clj
+                                                     com.google.code.findbugs/jsr305
+                                                     com.google.errorprone/error_prone_annotations]]
+                                       [com.cognitect/transit-clj "0.8.313" #_"transitive"]
+                                       [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
+                                       [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]]}
+
+             :ci       {:pedantic?    :abort
+                        :jvm-opts     ["-Dclojure.main.report=stderr"]
+                        :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.0.1"]]}})

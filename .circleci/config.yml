@@ -31,7 +31,7 @@ jobs:
         # fallback to using the latest cache if no exact match is found
         - v1-dependencies-
 
-    - run: lein deps
+    - run: lein with-profile -dev,+ci deps
 
     - save_cache:
         paths:
@@ -65,10 +65,14 @@ jobs:
     steps:
       - run:
           name: import GPG key
-          command: echo -e "$GPG_KEY" | gpg --import
+          command: echo -e "$GPG_KEY_V2" | gpg --import
           
       - checkout
 
+      - run:
+          name: Perform pre-release sanity check
+          command: lein with-profile -dev,+ci run -m nedap.ci.release-workflow.api sanity-check
+          
       - run:
           name: release to JFrog
           command: lein deploy
@@ -83,9 +87,7 @@ workflows:
             branches:
               only: /.*/
             tags:
-              only: /^v\d+\.\d+\.\d+(-[A-Z]*)*$/
-
-
+              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/              
       - jfrog:
           context: JFrog
           requires: 
@@ -94,4 +96,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^v\d+\.\d+\.\d+(-[A-Z]*)*$/
+              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/
