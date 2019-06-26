@@ -12,7 +12,7 @@ What's the difference?
 
 * All conditions are evaluated, and it is asserted that exactly one is true
   * If zero matched, we would incur into _implicit nil defaulting_.
-  * If N matched, we would incur into _sequential semantics_.
+  * If 2+ matched, we would incur into _sequential semantics_.
 
 * Duplicate conditions are forbidden
   * e.g. `(cond 1 2, 1 2)` has the `1` condition duplicated. `clojure.core/cond` would happily compile that. 

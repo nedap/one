@@ -5,11 +5,11 @@
 (defmacro one
   "Exactly like `#'cond`, but on `#'*assert*`, the following will be checked:
 
-  * No duplicate conditions are contained
+  * No duplicate conditions are contained; and
   * Exactly one condition is truthy.
 
   Helps avoiding sequential semantics, and related ambiguity
-  (is a given `cond`? inherently or unintentionally sequential?).
+  (is a given `cond`? intentionally or unintentionally sequential?).
 
   For said checking, all conditions are evaluated eagerly, so they should be side-effect free.
   Only the truthy condition's 'consequence' will be evaluated, and once."
