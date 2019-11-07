@@ -12,6 +12,7 @@
 .eastwood
 .idea/
 .nrepl-port
+.rebl/
 .repl
 /.lein-*
 /checkouts
