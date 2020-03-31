@@ -80,7 +80,7 @@ I would recommend `one` when no need for extensibility is foreseen, and keeping 
 ## Installation
 
 ```clojure
-[com.nedap.staffing-solutions/one "1.0.0"]
+[com.nedap.staffing-solutions/one "1.1.0"]
 ```
 
 ## ns organisation
