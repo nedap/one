@@ -69,15 +69,19 @@ jobs:
       - store_artifacts:
           path: ~/repo/coverage
   test_cljs_code:
+    parameters:
+      cljsbuild:
+        description: The cljsbuild build to be run
+        type: string  
     executor: openjdk8-node
     steps:
       - setup-env
       - run:
           name: 'Compile ClojureScript test suite'
-          command: lein with-profile -dev,+test do clean, cljsbuild once test 
+          command: lein with-profile -dev,+test do clean, cljsbuild once << parameters.cljsbuild >> 
       - run:
           name: 'Run node.js tests'
-          command: node target/out/tests.js
+          command: node target/<< parameters.cljsbuild >>/out/tests.js
   deploy:
     executor: openjdk8
     steps:
@@ -118,7 +122,14 @@ workflows:
           context: JFrog
           <<: *test_code_filters
       - test_cljs_code:
+          name: "Run ClojureScript tests"
           context: JFrog
+          cljsbuild: test
+          <<: *test_code_filters
+      - test_cljs_code:
+          name: "Run ClojureScript tests, without *assert*"
+          context: JFrog
+          cljsbuild: test-no-assert
           <<: *test_code_filters
       - test_code:
           name: "JDK 8, plain"
@@ -160,7 +171,8 @@ workflows:
           context: JFrog
           requires:
             - "Ensure artifact isolation, inform of boxed math"
-            - test_cljs_code
+            - "Run ClojureScript tests"
+            - "Run ClojureScript tests, without *assert*"
             - cloverage
             - "JDK 8, plain"
             - "JDK 8, with production-like compiler flags"

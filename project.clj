@@ -39,12 +39,20 @@
 
   ;; Please don't add `:hooks [leiningen.cljsbuild]`. It can silently skip running the JS suite on `lein test`.
   ;; It also interferes with Cloverage.
-  :cljsbuild {:builds {"test" {:source-paths ["src" "test"]
-                               :compiler     {:main          nedap.one.test-runner
-                                              :output-to     "target/out/tests.js"
-                                              :output-dir    "target/out"
-                                              :target        :nodejs
-                                              :optimizations :none}}}}
+  :cljsbuild {:builds {"test"           {:source-paths ["src" "test"]
+                                         :compiler     {:main          nedap.one.test-runner
+                                                        :output-to     "target/test/out/tests.js"
+                                                        :output-dir    "target/test/out"
+                                                        :target        :nodejs
+                                                        :optimizations :none}}
+                       "test-no-assert" {:source-paths ["src" "test"]
+                                         :compiler     {:main            nedap.one.test-runner
+                                                        :output-to       "target/test-no-assert/out/tests.js"
+                                                        :output-dir      "target/test-no-assert/out"
+                                                        :target          :nodejs
+                                                        :elide-asserts   true
+                                                        :closure-defines {"unit.nedap.one.api.ASSERT" false}
+                                                        :optimizations   :none}}}}
 
   ;; A variety of common dependencies are bundled with `nedap/lein-template`.
   ;; They are divided into two categories:
